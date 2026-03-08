@@ -1,114 +1,141 @@
 import React from 'react';
-import { LayoutDashboard, AppWindow, ShieldCheck, Zap } from 'lucide-react';
+import {
+    LayoutDashboard,
+    AppWindow,
+    Clock,
+    Flame,
+    ShieldCheck,
+    ChevronRight,
+    Search
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
-const StatCard = ({ title, value, icon: Icon, color }) => (
-    <div className="card" style={{ flex: 1, minWidth: '200px', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        <div style={{
-            backgroundColor: `${color}15`,
-            color: color,
-            padding: '0.75rem',
-            borderRadius: '12px'
-        }}>
-            <Icon size={24} />
+const StatCard = ({ title, value, icon: Icon, color, trend }) => (
+    <div className="card" style={{ flex: 1, minWidth: '240px', display: 'flex', flexDirection: 'column', gap: '0.5rem', padding: '1.5rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div style={{
+                backgroundColor: `${color}15`,
+                color: color,
+                padding: '0.6rem',
+                borderRadius: '10px'
+            }}>
+                <Icon size={20} />
+            </div>
+            {trend && (
+                <span style={{ fontSize: '0.8rem', color: '#10B981', fontWeight: '600', display: 'flex', alignItems: 'center' }}>
+                    {trend}
+                </span>
+            )}
         </div>
-        <div>
-            <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{title}</div>
-            <div style={{ fontSize: '1.25rem', fontWeight: '700' }}>{value}</div>
+        <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '0.5rem' }}>{title}</div>
+        <div style={{ fontSize: '1.75rem', fontWeight: '700' }}>{value}</div>
+    </div>
+);
+
+const ActivityItem = ({ type, title, time, status }) => (
+    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', padding: '0.75rem 0' }}>
+        <div style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '50%',
+            backgroundColor: status === 'success' ? '#DCFCE7' : status === 'warning' ? '#FEF3C7' : '#FEE2E2',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: status === 'success' ? '#166534' : status === 'warning' ? '#92400E' : '#991B1B'
+        }}>
+            <ShieldCheck size={18} />
+        </div>
+        <div style={{ flex: 1 }}>
+            <div style={{ fontSize: '0.9rem', fontWeight: '600' }}>{title}</div>
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{time}</div>
         </div>
     </div>
 );
 
 const Dashboard = () => {
     const navigate = useNavigate();
-    const container = {
-        hidden: { opacity: 0 },
-        show: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.1
-            }
-        }
-    };
 
-    const item = {
-        hidden: { y: 20, opacity: 0 },
-        show: { y: 0, opacity: 1 }
-    };
+    const quickAccess = [
+        { id: 1, name: 'Figma', icon: 'F', category: 'Design', desc: 'Collaborative interface design tool.' },
+        { id: 2, name: 'Notion', icon: 'N', category: 'Documentation', desc: 'All-in-one workspace for notes and docs.' },
+    ];
 
-    const recentApps = [
-        { id: 1, name: 'Figma', icon: '🎨', category: 'Design', status: 'Active' },
-        { id: 2, name: 'GitHub', icon: '💻', category: 'Développement', status: 'Active' },
-        { id: 3, name: 'Slack', icon: '💬', category: 'Communication', status: 'Active' },
-        { id: 4, name: 'Jira', icon: '✅', category: 'Gestion', status: 'Active' },
+    const activities = [
+        { title: 'SSO Login - Figma', time: '10 mins ago', status: 'success' },
+        { title: 'Session Expired - AWS Console', time: '2 hours ago', status: 'warning' },
+        { title: 'SSO Login - Slack', time: '5 hours ago', status: 'success' },
+        { title: 'Failed Login Attempt - Salesforce', time: '1 day ago', status: 'danger' },
     ];
 
     return (
         <motion.div
-            variants={container}
-            initial="hidden"
-            animate="show"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
             className="page-container"
-            style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}
+            style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}
         >
-            <header>
-                <h1 style={{ fontSize: '1.75rem', fontWeight: '700', marginBottom: '0.5rem' }}>Bonjour, Jean 👋</h1>
-                <p style={{ color: 'var(--text-muted)' }}>Voici un aperçu de vos accès et applications.</p>
-            </header>
-
             <section style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
-                <StatCard title="Total Applications" value="24" icon={AppWindow} color="#5E3BEE" />
-                <StatCard title="Connexions SSO" value="12" icon={ShieldCheck} color="#10B981" />
-                <StatCard title="Alertes Sécurité" value="0" icon={Zap} color="#F59E0B" />
-                <StatCard title="Temps d'Action" value="1.2s" icon={LayoutDashboard} color="#3B82F6" />
+                <StatCard title="Active Applications" value="12" icon={AppWindow} color="#5E3BEE" />
+                <StatCard title="Pending Requests" value="3" icon={Clock} color="#F59E0B" />
+                <StatCard title="Login Streak" value="15 days" icon={Flame} color="#3B82F6" trend="↗ +2" />
+                <StatCard title="Security Score" value="92%" icon={ShieldCheck} color="#10B981" trend="↗ +5%" />
             </section>
 
-            <section>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                    <h2 style={{ fontSize: '1.25rem', fontWeight: '600' }}>Applications Récemment Utilisées</h2>
-                    <button className="btn btn-ghost" style={{ fontSize: '0.85rem' }} onClick={() => navigate('/MyApplications')}>Voir tout</button>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
-                    {recentApps.map((app) => (
-                        <motion.div
-                            key={app.id}
-                            variants={item}
-                            className="card"
-                            style={{ display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer' }}
-                            onClick={() => navigate(`/app/${app.id}`)}
-                            whileHover={{ y: -5, boxShadow: 'var(--shadow-lg)' }}
-                        >
-                            <div style={{
-                                width: '48px',
-                                height: '48px',
-                                backgroundColor: 'var(--bg-main)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                fontSize: '1.5rem',
-                                borderRadius: '12px'
-                            }}>
-                                {app.icon}
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem' }}>
+                <section>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                        <h2 style={{ fontSize: '1.25rem', fontWeight: '700' }}>Quick Access</h2>
+                        <button className="btn btn-ghost" style={{ fontSize: '0.85rem', color: 'var(--primary)' }} onClick={() => navigate('/MyApplications')}>View all</button>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
+                        {quickAccess.map((app) => (
+                            <div key={app.id} className="card" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', padding: '1.5rem' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                    <div style={{
+                                        width: '44px',
+                                        height: '44px',
+                                        backgroundColor: 'var(--primary-soft)',
+                                        color: 'var(--primary)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontSize: '1.2rem',
+                                        fontWeight: '700',
+                                        borderRadius: '10px'
+                                    }}>
+                                        {app.icon}
+                                    </div>
+                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', backgroundColor: 'var(--bg-main)', padding: '0.25rem 0.6rem', borderRadius: '4px' }}>{app.category}</span>
+                                </div>
+                                <div>
+                                    <h3 style={{ fontSize: '1.1rem', fontWeight: '600', marginBottom: '0.25rem' }}>{app.name}</h3>
+                                    <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', lineHeight: '1.5' }}>{app.desc}</p>
+                                </div>
+                                <button className="btn btn-secondary" style={{ width: '100%', marginTop: '0.5rem', backgroundColor: 'var(--primary-soft)', color: 'var(--primary)', border: 'none' }} onClick={() => navigate(`/app/${app.id}`)}>
+                                    Open Application
+                                </button>
                             </div>
-                            <div style={{ flex: 1 }}>
-                                <div style={{ fontWeight: '600' }}>{app.name}</div>
-                                <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{app.category}</div>
-                            </div>
-                            <div style={{
-                                padding: '0.25rem 0.75rem',
-                                backgroundColor: '#DCFCE7',
-                                color: '#166534',
-                                borderRadius: '20px',
-                                fontSize: '0.75rem',
-                                fontWeight: '600'
-                            }}>
-                                {app.status}
-                            </div>
-                        </motion.div>
-                    ))}
-                </div>
-            </section>
+                        ))}
+                    </div>
+                </section>
+
+                <section>
+                    <h2 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '1.5rem' }}>Recent Activity</h2>
+                    <div className="card" style={{ padding: '1.5rem' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            {activities.map((activity, idx) => (
+                                <ActivityItem key={idx} {...activity} />
+                            ))}
+                        </div>
+                        <button className="btn btn-ghost" style={{ width: '100%', marginTop: '1rem', fontSize: '0.85rem', backgroundColor: 'var(--bg-main)' }}>
+                            View full log
+                        </button>
+                    </div>
+                </section>
+            </div>
         </motion.div>
     );
 };
