@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Search, Filter, User, MoreHorizontal, ShieldOff } from 'lucide-react';
-import { motion } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import Modal from '../../components/Common/Modal';
 
 const AdminUsers = () => {
