@@ -1,31 +1,49 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Plus, Search, Filter, User, MoreHorizontal, ShieldOff } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion } from 'react-router-dom';
+import Modal from '../../components/Common/Modal';
 
 const AdminUsers = () => {
-    const users = [
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [users, setUsers] = useState([
         { id: 1, name: 'Jean Dupont', email: 'jean.dupont@base44.app', role: 'Admin', status: 'Actif' },
         { id: 2, name: 'Alice Martin', email: 'alice.m@entreprise.fr', role: 'Utilisateur', status: 'Actif' },
         { id: 3, name: 'Bob Durand', email: 'bob.d@corp.com', role: 'Utilisateur', status: 'Inactif' },
         { id: 4, name: 'Sophie Bernard', email: 'sophie.b@test.re', role: 'Manager', status: 'Actif' },
         { id: 5, name: 'Marc Petit', email: 'marc.p@web.com', role: 'Utilisateur', status: 'Suspendu' },
-    ];
+    ]);
+
+    const [newUser, setNewUser] = useState({ name: '', email: '', role: 'Utilisateur' });
+
+    const handleAddUser = (e) => {
+        e.preventDefault();
+        const user = {
+            id: users.length + 1,
+            ...newUser,
+            status: 'Actif'
+        };
+        setUsers([...users, user]);
+        setIsModalOpen(false);
+        setNewUser({ name: '', email: '', role: 'Utilisateur' });
+    };
 
     return (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="page-container" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            <header className="page-header">
                 <div>
-                    <h1 style={{ fontSize: '1.75rem', fontWeight: '700', marginBottom: '0.25rem' }}>Gestion des Utilisateurs</h1>
-                    <p style={{ color: 'var(--text-muted)' }}>Gérez les comptes, les rôles et les permissions d'accès.</p>
+                    <h1 className="page-title">Gestion des Utilisateurs</h1>
+                    <p className="page-subtitle">Gérez les comptes, les rôles et les permissions d'accès.</p>
                 </div>
-                <button className="btn btn-primary"><Plus size={18} /> Ajouter un Utilisateur</button>
+                <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>
+                    <Plus size={18} /> Ajouter un Utilisateur
+                </button>
             </header>
 
             <section className="card" style={{ padding: 0 }}>
                 <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ position: 'relative', width: '300px' }}>
                         <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-                        <input type="text" placeholder="Rechercher un utilisateur..." style={{ width: '100%', padding: '0.5rem 1rem 0.5rem 2.5rem', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '0.9rem' }} />
+                        <input type="text" className="form-input" placeholder="Rechercher un utilisateur..." style={{ paddingLeft: '2.5rem' }} />
                     </div>
                     <button className="btn btn-secondary"><Filter size={16} /> Filtres</button>
                 </div>
@@ -78,7 +96,50 @@ const AdminUsers = () => {
                     </tbody>
                 </table>
             </section>
-        </motion.div>
+
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Inviter un Utilisateur">
+                <form onSubmit={handleAddUser}>
+                    <div className="form-group">
+                        <label>Nom complet</label>
+                        <input
+                            type="text"
+                            className="form-input"
+                            required
+                            value={newUser.name}
+                            onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                            placeholder="ex: Jean Dupont"
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Adresse Email</label>
+                        <input
+                            type="email"
+                            className="form-input"
+                            required
+                            value={newUser.email}
+                            onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                            placeholder="ex: jean.dupont@entreprise.com"
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Rôle</label>
+                        <select
+                            className="form-input"
+                            value={newUser.role}
+                            onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
+                        >
+                            <option value="Utilisateur">Utilisateur standard</option>
+                            <option value="Manager">Manager</option>
+                            <option value="Admin">Administrateur</option>
+                        </select>
+                    </div>
+                    <div className="modal-actions">
+                        <button type="button" className="btn btn-ghost" onClick={() => setIsModalOpen(false)}>Annuler</button>
+                        <button type="submit" className="btn btn-primary">Envoyer l'invitation</button>
+                    </div>
+                </form>
+            </Modal>
+        </div>
     );
 };
 

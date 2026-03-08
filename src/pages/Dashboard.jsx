@@ -1,6 +1,7 @@
 import React from 'react';
 import { LayoutDashboard, AppWindow, ShieldCheck, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 const StatCard = ({ title, value, icon: Icon, color }) => (
     <div className="card" style={{ flex: 1, minWidth: '200px', display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -20,6 +21,7 @@ const StatCard = ({ title, value, icon: Icon, color }) => (
 );
 
 const Dashboard = () => {
+    const navigate = useNavigate();
     const container = {
         hidden: { opacity: 0 },
         show: {
@@ -36,10 +38,10 @@ const Dashboard = () => {
     };
 
     const recentApps = [
-        { name: 'Figma', icon: '🎨', category: 'Design', status: 'Active' },
-        { name: 'GitHub', icon: '💻', category: 'Développement', status: 'Active' },
-        { name: 'Slack', icon: '💬', category: 'Communication', status: 'Active' },
-        { name: 'Jira', icon: '✅', category: 'Gestion', status: 'Active' },
+        { id: 1, name: 'Figma', icon: '🎨', category: 'Design', status: 'Active' },
+        { id: 2, name: 'GitHub', icon: '💻', category: 'Développement', status: 'Active' },
+        { id: 3, name: 'Slack', icon: '💬', category: 'Communication', status: 'Active' },
+        { id: 4, name: 'Jira', icon: '✅', category: 'Gestion', status: 'Active' },
     ];
 
     return (
@@ -47,6 +49,7 @@ const Dashboard = () => {
             variants={container}
             initial="hidden"
             animate="show"
+            className="page-container"
             style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}
         >
             <header>
@@ -64,11 +67,18 @@ const Dashboard = () => {
             <section>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                     <h2 style={{ fontSize: '1.25rem', fontWeight: '600' }}>Applications Récemment Utilisées</h2>
-                    <button className="btn btn-ghost" style={{ fontSize: '0.85rem' }}>Voir tout</button>
+                    <button className="btn btn-ghost" style={{ fontSize: '0.85rem' }} onClick={() => navigate('/MyApplications')}>Voir tout</button>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
-                    {recentApps.map((app, idx) => (
-                        <motion.div key={idx} variants={item} className="card" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    {recentApps.map((app) => (
+                        <motion.div
+                            key={app.id}
+                            variants={item}
+                            className="card"
+                            style={{ display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer' }}
+                            onClick={() => navigate(`/app/${app.id}`)}
+                            whileHover={{ y: -5, boxShadow: 'var(--shadow-lg)' }}
+                        >
                             <div style={{
                                 width: '48px',
                                 height: '48px',

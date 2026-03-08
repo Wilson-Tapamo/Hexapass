@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { Search, Filter, AppWindow, ExternalLink } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 const MyApplications = () => {
+    const navigate = useNavigate();
     const [filter, setFilter] = useState('All');
+    const [searchQuery, setSearchQuery] = useState('');
 
     const categories = ['All', 'Design', 'Développement', 'Communication', 'Gestion', 'Documentation'];
 
@@ -18,19 +21,30 @@ const MyApplications = () => {
         { id: 8, name: 'Vercel', icon: '▲', category: 'Développement', desc: 'Plateforme de déploiement cloud' },
     ];
 
-    const filteredApps = filter === 'All' ? apps : apps.filter(app => app.category === filter);
+    const filteredApps = apps.filter(app => {
+        const matchesFilter = filter === 'All' || app.category === filter;
+        const matchesSearch = app.name.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesFilter && matchesSearch;
+    });
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+        <div className="page-container" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            <header className="page-header">
                 <div>
-                    <h1 style={{ fontSize: '1.75rem', fontWeight: '700', marginBottom: '0.25rem' }}>Mes Applications</h1>
-                    <p style={{ color: 'var(--text-muted)' }}>Accédez à tous vos outils en un seul clic.</p>
+                    <h1 className="page-title">Mes Applications</h1>
+                    <p className="page-subtitle">Accédez à tous vos outils en un seul clic.</p>
                 </div>
                 <div style={{ display: 'flex', gap: '1rem' }}>
                     <div style={{ position: 'relative' }}>
                         <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-                        <input type="text" placeholder="Rechercher..." style={{ padding: '0.5rem 1rem 0.5rem 2.5rem', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '0.9rem' }} />
+                        <input
+                            type="text"
+                            className="form-input"
+                            placeholder="Rechercher..."
+                            style={{ paddingLeft: '2.5rem' }}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
                     </div>
                     <button className="btn btn-secondary"><Filter size={16} /> Filtres</button>
                 </div>
@@ -41,13 +55,11 @@ const MyApplications = () => {
                     <button
                         key={cat}
                         onClick={() => setFilter(cat)}
-                        className="btn"
+                        className={`btn ${filter === cat ? 'btn-primary' : 'btn-ghost'}`}
                         style={{
-                            backgroundColor: filter === cat ? 'var(--primary)' : 'var(--bg-card)',
-                            color: filter === cat ? 'white' : 'var(--text-muted)',
-                            border: '1px solid var(--border)',
                             padding: '0.4rem 1rem',
-                            fontSize: '0.85rem'
+                            fontSize: '0.85rem',
+                            border: filter === cat ? 'none' : '1px solid var(--border)'
                         }}
                     >
                         {cat}
@@ -63,7 +75,9 @@ const MyApplications = () => {
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         className="card"
-                        style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
+                        style={{ display: 'flex', flexDirection: 'column', gap: '1rem', cursor: 'pointer' }}
+                        onClick={() => navigate(`/app/${app.id}`)}
+                        whileHover={{ y: -5, boxShadow: 'var(--shadow-lg)' }}
                     >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div style={{
@@ -78,7 +92,7 @@ const MyApplications = () => {
                             }}>
                                 {app.icon}
                             </div>
-                            <button className="btn btn-ghost" style={{ padding: '0.5rem' }}><ExternalLink size={18} /></button>
+                            <button className="btn btn-ghost" style={{ padding: '0.5rem' }} onClick={(e) => { e.stopPropagation(); alert('Lancement SSO en cours...'); }}><ExternalLink size={18} /></button>
                         </div>
                         <div>
                             <h3 style={{ fontSize: '1.1rem', fontWeight: '600' }}>{app.name}</h3>
@@ -86,7 +100,7 @@ const MyApplications = () => {
                         </div>
                         <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', backgroundColor: 'var(--bg-main)', padding: '0.25rem 0.6rem', borderRadius: '4px' }}>{app.category}</span>
-                            <button className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}>Ouvrir</button>
+                            <button className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}>Détails</button>
                         </div>
                     </motion.div>
                 ))}
